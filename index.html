@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Gestão</title>
+    
+    <!-- Ícone do Site (Favicon) -->
+    <link rel="icon" href="favicon.ico" type="image/png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- Variáveis de Personalização de Cores --- */
+        :root {
+            --cor-fundo-pagina: #ffffff; 
+            --cor-primaria: #fce301;
+            --cor-texto-principal: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: var(--cor-fundo-pagina);
+        }
+
+        .seta-ordenacao { opacity: 0.5; transition: opacity 0.2s ease-in-out; }
+        .seta-ordenacao.ativo { opacity: 1; }
+        .animacao-entrada { animation: fadeIn 0.3s ease-out; }
+        .animacao-conteudo-entrada { animation: scaleUp 0.3s ease-out; }
+        .animacao-notificacao-entrada { animation: slideIn 0.4s ease-out; }
+        .animacao-notificacao-saida { animation: slideOut 0.4s ease-in forwards; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        /* Estilo para link de navegação ativo */
+        .nav-link-ativo {
+            background-color: var(--cor-primaria);
+            color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex h-screen">
+        <!-- Navegação Lateral -->
+        <aside class="w-64 bg-white shadow-md flex flex-col">
+            <div class="flex items-center justify-center p-5 border-b gap-3">
+                <img src="BeeB.png" alt="Logo Beeterprise" class="h-40 w-auto">
+                <span class="text-2xl font-bold text-[var(--cor-primaria)]"></span>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" data-tela="usuarios" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200 nav-link-ativo">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 006-6v-1a6 6 0 00-9-5.197"></path></svg>
+                    Usuários
+                </a>
+                <a href="#" data-tela="financeiro" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                    Financeiro
+                </a>
+                <a href="#" data-tela="projetos" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Projetos
+                </a>
+                <a href="#" data-tela="relatorios" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Relatórios
+                </a>
+                <a href="#" data-tela="cursos" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200">
+                   <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    Cursos
+                </a>
+                <a href="#" data-tela="suporte" class="nav-link flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V7a2 2 0 012-2h6l2-2h2l-2 2z"></path></svg>
+                    Suporte
+                </a>
+            </nav>
+            <div class="mt-auto p-4 text-center text-xs text-gray-500 border-t">
+                <span>&copy; 2025 Beeterprise.</span>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            
+            <!-- TELA 1: USUÁRIOS -->
+            <div id="tela-usuarios" class="tela-conteudo">
+                <div class="w-full max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Lista de Usuários</h1>
+                            <p class="text-gray-500 mt-1">Gerencie os usuários do sistema de forma fácil e rápida.</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                            <button id="btnAdicionarUsuario" class="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                Adicionar
+                            </button>
+                            <div class="relative w-full sm:w-auto">
+                                <input type="text" id="campoBusca" placeholder="Buscar..." class="pl-10 pr-4 py-2 w-full md:w-64 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider cursor-pointer" data-ordenacao="nome"><div class="flex items-center">Nome<span class="ml-1 seta-ordenacao" data-seta-ordenacao="nome"></span></div></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider cursor-pointer" data-ordenacao="cargo"><div class="flex items-center">Cargo<span class="ml-1 seta-ordenacao" data-seta-ordenacao="cargo"></span></div></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Produtividade (7d)</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider cursor-pointer" data-ordenacao="ultimoAcesso"><div class="flex items-center">Último Acesso<span class="ml-1 seta-ordenacao" data-seta-ordenacao="ultimoAcesso"></span></div></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoTabela" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                        <div id="semResultados" class="hidden text-center p-8 text-gray-500">Nenhum resultado encontrado.</div>
+                    </div>
+                    <div class="flex items-center justify-between mt-6">
+                        <div class="text-sm text-gray-600">Mostrando <span id="entradaInicial">1</span> a <span id="entradaFinal">10</span> de <span id="totalEntradas">50</span> resultados</div>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnPaginaAnterior" class="px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">Anterior</button>
+                            <span id="infoPagina" class="text-sm text-gray-700">Página 1</span>
+                            <button id="btnPaginaProxima" class="px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">Próxima</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TELA 2: DASHBOARD FINANCEIRO -->
+            <div id="tela-financeiro" class="tela-conteudo hidden">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Dashboard Financeiro</h1>
+                <!-- Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Faturamento Mensal</h3><p id="card-faturamento" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Custos</h3><p id="card-custos" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Lucro Líquido</h3><p id="card-lucro" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Crescimento (vs. Mês Ant.)</h3><p id="card-crescimento" class="text-3xl font-bold text-green-500 mt-2">+0%</p></div>
+                </div>
+                <!-- Gráficos -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg"><h3 class="font-bold mb-4">Receita x Despesa (Últimos 6 meses)</h3><canvas id="grafico-receita-despesa"></canvas></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="font-bold mb-4">Distribuição de Custos</h3><canvas id="grafico-distribuicao-custos"></canvas></div>
+                </div>
+            </div>
+
+            <!-- TELA 3: PROJETOS EM ANDAMENTO -->
+            <div id="tela-projetos" class="tela-conteudo hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Projetos em Andamento</h1>
+                    <select id="filtro-departamento" class="border-gray-300 rounded-lg"><option value="todos">Todos os Departamentos</option><option>Tecnologia</option><option>Marketing</option><option>RH</option></select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Colunas Kanban -->
+                    <div><h2 class="text-lg font-bold mb-4">Planejado</h2><div id="coluna-planejado" class="space-y-4 bg-gray-100 p-4 rounded-xl min-h-[200px]"></div></div>
+                    <div><h2 class="text-lg font-bold mb-4">Em Progresso</h2><div id="coluna-progresso" class="space-y-4 bg-gray-100 p-4 rounded-xl min-h-[200px]"></div></div>
+                    <div><h2 class="text-lg font-bold mb-4">Concluído</h2><div id="coluna-concluido" class="space-y-4 bg-gray-100 p-4 rounded-xl min-h-[200px]"></div></div>
+                </div>
+            </div>
+
+            <!-- TELA 4: RELATÓRIOS E INDICADORES -->
+            <div id="tela-relatorios" class="tela-conteudo hidden">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Relatórios e Indicadores</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">NPS Interno (Satisfação)</h3><p id="indicador-nps" class="text-3xl font-bold text-gray-800 mt-2">0</p></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Taxa de Turnover (Últ. Trimestre)</h3><p id="indicador-turnover" class="text-3xl font-bold text-gray-800 mt-2">0%</p></div>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-2xl shadow-lg"><h3 class="font-bold mb-4">Produtividade por Departamento</h3><canvas id="grafico-produtividade-depto"></canvas></div>
+            </div>
+
+            <!-- TELA 5: CURSOS E TREINAMENTOS -->
+            <div id="tela-cursos" class="tela-conteudo hidden">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Plataforma de Treinamento</h1>
+                <div class="bg-white p-6 rounded-2xl shadow-lg mb-6">
+                    <label for="selecao-colaborador" class="block text-sm font-medium text-gray-700 mb-2">Selecione um colaborador para ver os cursos recomendados:</label>
+                    <select id="selecao-colaborador" class="w-full md:w-1/3 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                </div>
+                <div id="container-cursos-recomendados" class="hidden">
+                     <h2 class="text-xl font-bold text-gray-800 mb-4">Cursos Recomendados</h2>
+                     <div id="lista-cursos-recomendados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></div>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Catálogo Completo de Cursos</h2>
+                <div id="catalogo-cursos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- TELA 6: SUPORTE / HELPDESK -->
+            <div id="tela-suporte" class="tela-conteudo hidden">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Suporte / Helpdesk</h1>
+                <!-- Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Tickets Abertos</h3><p id="card-tickets-abertos" class="text-3xl font-bold text-yellow-500 mt-2">0</p></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Tickets Resolvidos (Mês)</h3><p id="card-tickets-resolvidos" class="text-3xl font-bold text-green-500 mt-2">0</p></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-gray-500">Tempo Médio de Resposta</h3><p id="card-tempo-resposta" class="text-3xl font-bold text-gray-800 mt-2">0h 0m</p></div>
+                </div>
+                <!-- Tabela de Tickets -->
+                <div class="w-full bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Tickets Recentes</h2>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Ticket ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Cliente</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Assunto</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Data de Abertura</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoTabelaSuporte" class="bg-white divide-y divide-gray-200">
+                                <!-- Linhas da tabela serão inseridas aqui via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modais (permanecem fora do conteúdo principal para sobrepor tudo) -->
+    <div id="modalFormulario" class="fixed inset-0 bg-gray-600 bg-opacity-50 h-full w-full hidden items-center justify-center z-50 animacao-entrada">
+        <div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-2xl bg-white animacao-conteudo-entrada">
+            <div class="mt-3">
+                 <div class="flex justify-between items-center mb-4">
+                    <h3 id="tituloModal" class="text-lg leading-6 font-bold text-gray-900">Adicionar Usuário</h3>
+                    <button id="btnFecharModal" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+                 </div>
+                <form id="formularioUsuario">
+                    <input type="hidden" id="idUsuario" name="idUsuario">
+                    <div class="space-y-4">
+                        <div class="text-left">
+                            <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
+                            <input type="text" name="nome" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                         <div class="text-left">
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                         <div class="text-left">
+                            <label for="cargo" class="block text-sm font-medium text-gray-700">Cargo</label>
+                            <input type="text" name="cargo" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div class="text-left">
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                            <select name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option>Ativo</option>
+                                <option>Inativo</option>
+                                <option>Férias</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="items-center px-4 py-3 mt-6 bg-gray-50 rounded-b-xl -mx-5 -mb-5 text-right">
+                        <button id="btnCancelar" type="button" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md mr-2 hover:bg-gray-50 focus:outline-none">Cancelar</button>
+                        <button id="btnSalvar" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="modalConfirmacao" class="fixed inset-0 bg-gray-600 bg-opacity-50 h-full w-full hidden items-center justify-center z-50 animacao-entrada">
+        <div class="relative mx-auto p-6 border w-full max-w-sm shadow-lg rounded-2xl bg-white animacao-conteudo-entrada">
+            <div class="text-center">
+                 <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                 </div>
+                <h3 class="text-lg leading-6 font-bold text-gray-900 mt-4">Excluir Usuário</h3>
+                <p class="text-sm text-gray-500 mt-2">Você tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.</p>
+                <div class="mt-6 flex justify-center gap-4">
+                    <button id="btnCancelarExclusao" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none w-24">Cancelar</button>
+                    <button id="btnConfirmarExclusao" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 w-24">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="containerNotificacao" class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- BLOCO DE CONFIGURAÇÕES PERSONALIZÁVEIS ---
+    const LINHAS_POR_PAGINA = 5;
+    const COR_GRAFICO = getComputedStyle(document.documentElement).getPropertyValue('--cor-primaria').trim();
+
+    // --- BLOCO DE DADOS FICTÍCIOS (MOCK) ---
+    let dadosFicticios = [
+        { id: 1, nome: 'Ana Silva', email: 'ana.silva@example.com', cargo: 'Desenvolvedora Front-end', status: 'Ativo', ultimoAcesso: '2025-09-10T10:30:00Z', avatar: 'https://i.pravatar.cc/150?u=1', produtividade: [10, 40, 25, 50, 30, 70, 60] },
+        { id: 2, nome: 'Bruno Costa', email: 'bruno.costa@example.com', cargo: 'Designer UX/UI', status: 'Ativo', ultimoAcesso: '2025-09-10T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=2', produtividade: [50, 45, 60, 55, 70, 75, 80] },
+        { id: 3, nome: 'Carla Dias', email: 'carla.dias@example.com', cargo: 'Gerente de Projetos', status: 'Inativo', ultimoAcesso: '2025-08-20T14:00:00Z', avatar: 'https://i.pravatar.cc/150?u=3', produtividade: [30, 35, 20, 10, 0, 0, 0] },
+        { id: 4, nome: 'Daniel Martins', email: 'daniel.martins@example.com', cargo: 'Desenvolvedor Back-end', status: 'Ativo', ultimoAcesso: '2025-09-09T18:45:00Z', avatar: 'https://i.pravatar.cc/150?u=4', produtividade: [80, 85, 90, 88, 92, 95, 93] },
+        { id: 5, nome: 'Eduarda Ferreira', email: 'eduarda.f@example.com', cargo: 'Analista de QA', status: 'Ativo', ultimoAcesso: '2025-09-10T11:00:00Z', avatar: 'https://i.pravatar.cc/150?u=5', produtividade: [60, 62, 58, 65, 70, 68, 72] },
+        { id: 6, nome: 'Fábio Souza', email: 'fabio.s@example.com', cargo: 'DevOps', status: 'Ativo', ultimoAcesso: '2025-09-08T22:10:00Z', avatar: 'https://i.pravatar.cc/150?u=6', produtividade: [40, 42, 50, 48, 55, 60, 50] },
+        { id: 7, nome: 'Gabriela Lima', email: 'gabriela.l@example.com', cargo: 'Analista de Dados', status: 'Férias', ultimoAcesso: '2025-09-01T12:00:00Z', avatar: 'https://i.pravatar.cc/150?u=7', produtividade: [70, 75, 80, 0, 0, 0, 0] },
+        { id: 8, nome: 'Hugo Pereira', email: 'hugo.p@example.com', cargo: 'Desenvolvedor Full-stack', status: 'Ativo', ultimoAcesso: '2025-09-10T10:55:00Z', avatar: 'https://i.pravatar.cc/150?u=8', produtividade: [85, 88, 82, 90, 93, 89, 95] },
+        { id: 9, nome: 'Isabela Santos', email: 'isabela.s@example.com', cargo: 'Recrutadora de TI', status: 'Ativo', ultimoAcesso: '2025-09-10T08:30:00Z', avatar: 'https://i.pravatar.cc/150?u=9', produtividade: [20, 25, 30, 35, 40, 38, 42] },
+        { id: 10, nome: 'João Oliveira', email: 'joao.o@example.com', cargo: 'CTO', status: 'Ativo', ultimoAcesso: '2025-09-07T17:00:00Z', avatar: 'https://i.pravatar.cc/150?u=10', produtividade: [90, 92, 95, 94, 98, 96, 100] },
+        { id: 11, nome: 'Larissa Almeida', email: 'larissa.a@example.com', cargo: 'Desenvolvedora Mobile', status: 'Inativo', ultimoAcesso: '2025-07-30T10:00:00Z', avatar: 'https://i.pravatar.cc/150?u=11', produtividade: [55, 58, 62, 40, 10, 0, 0] },
+        { id: 12, nome: 'Marcos Ribeiro', email: 'marcos.r@example.com', cargo: 'Engenheiro de Software', status: 'Ativo', ultimoAcesso: '2025-09-09T11:20:00Z', avatar: 'https://i.pravatar.cc/150?u=12', produtividade: [75, 78, 80, 82, 85, 83, 88] },
+    ];
+    const dadosFinanceiros = {
+        faturamento: 125400.50, custos: 78950.00, lucro: 46450.50, crescimento: 12,
+        receitaDespesa: { labels: ['Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'], receita: [80000, 95000, 110000, 105000, 120000, 125000], despesa: [50000, 60000, 65000, 70000, 75000, 78000] },
+        distribuicaoCustos: { labels: ['Salários', 'Marketing', 'Infra', 'Outros'], valores: [60, 20, 15, 5] }
+    };
+    const dadosProjetos = [
+        { id: 1, nome: 'Novo App Mobile', responsavel: 'Ana Silva', prazo: '2025-10-30', status: 'Em Progresso', departamento: 'Tecnologia' },
+        { id: 2, nome: 'Campanha de Marketing Q4', responsavel: 'Bruno Costa', prazo: '2025-12-15', status: 'Planejado', departamento: 'Marketing' },
+        { id: 3, nome: 'Migração de Servidor', responsavel: 'Daniel Martins', prazo: '2025-09-25', status: 'Concluído', departamento: 'Tecnologia' },
+        { id: 4, nome: 'Pesquisa de Clima Org.', responsavel: 'Isabela Santos', prazo: '2025-11-20', status: 'Planejado', departamento: 'RH' },
+    ];
+    const dadosRelatorios = {
+        nps: 78, turnover: 4.5, produtividadeDepto: { labels: ['Tecnologia', 'Marketing', 'RH', 'Vendas'], valores: [85, 72, 68, 81] }
+    };
+    const dadosCursos = [
+        { id: 101, titulo: 'React Avançado', categoria: 'Tecnologia', duracao: '20h' },
+        { id: 102, titulo: 'Figma para UI Design', categoria: 'Design', duracao: '15h' },
+        { id: 103, titulo: 'Gestão Ágil com Scrum', categoria: 'Gestão', duracao: '25h' },
+        { id: 104, titulo: 'Node.js e APIs REST', categoria: 'Tecnologia', duracao: '30h' },
+        { id: 105, titulo: 'Fundamentos de UX Research', categoria: 'Design', duracao: '18h' },
+        { id: 106, titulo: 'Técnicas de Negociação', categoria: 'Negócios', duracao: '12h' },
+        { id: 107, titulo: 'Cloud com AWS', categoria: 'Tecnologia', duracao: '40h' },
+        { id: 108, titulo: 'Liderança de Equipes', categoria: 'Gestão', duracao: '22h' },
+    ];
+    const mapaCargoCategoria = {
+        'Desenvolvedora Front-end': ['Tecnologia'],
+        'Designer UX/UI': ['Design'],
+        'Gerente de Projetos': ['Gestão', 'Negócios'],
+        'Desenvolvedor Back-end': ['Tecnologia'],
+        'Analista de QA': ['Tecnologia', 'Gestão'],
+        'DevOps': ['Tecnologia'],
+        'Analista de Dados': ['Tecnologia', 'Negócios'],
+        'Desenvolvedor Full-stack': ['Tecnologia'],
+        'Recrutadora de TI': ['Gestão', 'Negócios'],
+        'CTO': ['Tecnologia', 'Gestão', 'Negócios'],
+        'Desenvolvedora Mobile': ['Tecnologia'],
+        'Engenheiro de Software': ['Tecnologia']
+    };
+     const dadosSuporte = [
+        { id: 'TKT-001', cliente: 'SuperCorp', assunto: 'API não responde', status: 'Aberto', dataAbertura: '2025-09-10T09:15:00Z', dataResolucao: null },
+        { id: 'TKT-002', cliente: 'InovaTech', assunto: 'Erro no login', status: 'Em Andamento', dataAbertura: '2025-09-09T14:30:00Z', dataResolucao: null },
+        { id: 'TKT-003', cliente: 'Market Solutions', assunto: 'Dúvida sobre fatura', status: 'Resolvido', dataAbertura: '2025-09-08T11:00:00Z', dataResolucao: '2025-09-08T15:45:00Z' },
+        { id: 'TKT-004', cliente: 'MegaEmpresa', assunto: 'Lentidão no dashboard', status: 'Aberto', dataAbertura: '2025-09-10T10:05:00Z', dataResolucao: null },
+        { id: 'TKT-005', cliente: 'InovaTech', assunto: 'Relatório não exporta', status: 'Resolvido', dataAbertura: '2025-09-07T16:20:00Z', dataResolucao: '2025-09-09T10:00:00Z' },
+    ];
+
+    // --- BLOCO DE ESTADO GLOBAL ---
+    let paginaAtual = 1, colunaOrdenacao = 'nome', direcaoOrdenacao = 'asc', termoBusca = '', dadosFiltrados = [...dadosFicticios], idParaExcluir = null;
+    let graficoReceita, graficoCustos, graficoProdDepto; // Variáveis para armazenar instâncias dos gráficos
+
+    // --- BLOCO DE SELEÇÃO DE ELEMENTOS DO DOM ---
+    const corpoTabela = document.getElementById('corpoTabela'), campoBusca = document.getElementById('campoBusca'), btnPaginaAnterior = document.getElementById('btnPaginaAnterior'), btnPaginaProxima = document.getElementById('btnPaginaProxima'), infoPagina = document.getElementById('infoPagina'), entradaInicial = document.getElementById('entradaInicial'), entradaFinal = document.getElementById('entradaFinal'), totalEntradas = document.getElementById('totalEntradas'), divSemResultados = document.getElementById('semResultados');
+    const modalFormulario = document.getElementById('modalFormulario'), btnAdicionarUsuario = document.getElementById('btnAdicionarUsuario'), tituloModal = document.getElementById('tituloModal'), btnFecharModal = document.getElementById('btnFecharModal'), btnCancelar = document.getElementById('btnCancelar'), formularioUsuario = document.getElementById('formularioUsuario');
+    const modalConfirmacao = document.getElementById('modalConfirmacao'), btnCancelarExclusao = document.getElementById('btnCancelarExclusao'), btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
+    const containerNotificacao = document.getElementById('containerNotificacao');
+    const navLinks = document.querySelectorAll('.nav-link'), telas = document.querySelectorAll('.tela-conteudo');
+    const selecaoColaborador = document.getElementById('selecao-colaborador'), containerCursosRecomendados = document.getElementById('container-cursos-recomendados'), listaCursosRecomendados = document.getElementById('lista-cursos-recomendados'), catalogoCursos = document.getElementById('catalogo-cursos');
+    
+    // --- BLOCO DE FUNÇÕES DE NAVEGAÇÃO ---
+    const alternarTela = (idTela) => {
+        telas.forEach(tela => tela.classList.add('hidden'));
+        document.getElementById(`tela-${idTela}`).classList.remove('hidden');
+        navLinks.forEach(link => {
+            link.classList.toggle('nav-link-ativo', link.dataset.tela === idTela);
+        });
+    };
+
+    // --- BLOCO DE FUNÇÕES UTILITÁRIAS ---
+    const formatarData = (d) => new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(d));
+    const formatarMoeda = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const obterBadgeStatus = (s) => ({'ativo': 'bg-green-100 text-green-800','inativo': 'bg-red-100 text-red-800','férias': 'bg-yellow-100 text-yellow-800'})[s.toLowerCase()] || 'bg-gray-100';
+    const obterBadgeStatusSuporte = (s) => ({'aberto': 'bg-yellow-100 text-yellow-800', 'em andamento': 'bg-blue-100 text-blue-800', 'resolvido': 'bg-green-100 text-green-800'})[s.toLowerCase()] || 'bg-gray-100';
+
+    // --- BLOCO DE RENDERIZAÇÃO: TELA DE USUÁRIOS ---
+    const criarGraficoLinhaPequeno = (dados = []) => {
+        if (dados.length < 2) return '';
+        const largura = 120, altura = 30, espessuraLinha = 2;
+        const max = Math.max(...dados), min = Math.min(...dados);
+        const intervalo = max - min === 0 ? 1 : max - min;
+        const pontos = dados.map((d, i) => `${(i / (dados.length - 1)) * largura},${altura - ((d - min) / intervalo) * (altura - espessuraLinha * 2) + espessuraLinha}`).join(' ');
+        return `<svg viewBox="0 0 ${largura} ${altura}" class="w-full h-8" preserveAspectRatio="none"><polyline points="${pontos}" fill="none" stroke="${COR_GRAFICO}" stroke-width="${espessuraLinha}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    };
+
+    const renderizarTabela = () => {
+        dadosFiltrados = dadosFicticios.filter(item =>
+            Object.values(item).some(val => String(val).toLowerCase().includes(termoBusca))
+        );
+        dadosFiltrados.sort((a, b) => {
+            const valA = a[colunaOrdenacao], valB = b[colunaOrdenacao];
+            const comparacao = typeof valA === 'string' ? valA.localeCompare(valB) : new Date(valA) - new Date(valB);
+            return direcaoOrdenacao === 'asc' ? comparacao : -comparacao;
+        });
+        const dadosPaginados = dadosFiltrados.slice((paginaAtual - 1) * LINHAS_POR_PAGINA, paginaAtual * LINHAS_POR_PAGINA);
+        corpoTabela.innerHTML = '';
+        divSemResultados.classList.toggle('hidden', dadosPaginados.length > 0);
+        
+        dadosPaginados.forEach(item => {
+            const linha = `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="flex items-center"><div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded-full" src="${item.avatar}" alt="Avatar"></div><div class="ml-4"><div class="text-sm font-semibold text-gray-900">${item.nome}</div><div class="text-sm text-gray-500">${item.email}</div></div></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item.cargo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${obterBadgeStatus(item.status)}">${item.status}</span></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${criarGraficoLinhaPequeno(item.produtividade)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${formatarData(item.ultimoAcesso)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex items-center gap-4">
+                            <button data-id="${item.id}" class="btn-editar text-blue-600 hover:text-blue-900 font-medium">Editar</button>
+                            <button data-id="${item.id}" class="btn-excluir text-red-600 hover:text-red-900"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button>
+                        </div>
+                    </td>
+                </tr>`;
+            corpoTabela.innerHTML += linha;
+        });
+        atualizarPaginacao();
+        atualizarSetasOrdenacao();
+    };
+
+    const atualizarPaginacao = () => {
+        const total = dadosFiltrados.length;
+        const totalPaginas = Math.ceil(total / LINHAS_POR_PAGINA) || 1;
+        infoPagina.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+        btnPaginaAnterior.disabled = paginaAtual === 1;
+        btnPaginaProxima.disabled = paginaAtual === totalPaginas;
+        const inicio = total > 0 ? (paginaAtual - 1) * LINHAS_POR_PAGINA + 1 : 0;
+        entradaInicial.textContent = inicio;
+        entradaFinal.textContent = Math.min(paginaAtual * LINHAS_POR_PAGINA, total);
+        totalEntradas.textContent = total;
+    };
+
+    const atualizarSetasOrdenacao = () => {
+        document.querySelectorAll('.seta-ordenacao').forEach(seta => {
+            seta.innerHTML = '';
+            seta.classList.remove('ativo');
+        });
+        const setaAtiva = document.querySelector(`[data-seta-ordenacao="${colunaOrdenacao}"]`);
+        if (setaAtiva) {
+            setaAtiva.innerHTML = direcaoOrdenacao === 'asc' ? '&#9650;' : '&#9660;';
+            setaAtiva.classList.add('ativo');
+        }
+    };
+
+    // --- BLOCO DE RENDERIZAÇÃO: DASHBOARD FINANCEIRO ---
+    const renderizarFinanceiro = () => {
+        document.getElementById('card-faturamento').textContent = formatarMoeda(dadosFinanceiros.faturamento);
+        document.getElementById('card-custos').textContent = formatarMoeda(dadosFinanceiros.custos);
+        document.getElementById('card-lucro').textContent = formatarMoeda(dadosFinanceiros.lucro);
+        document.getElementById('card-crescimento').textContent = `+${dadosFinanceiros.crescimento}%`;
+        
+        const ctxReceita = document.getElementById('grafico-receita-despesa').getContext('2d');
+        if(graficoReceita) graficoReceita.destroy();
+        graficoReceita = new Chart(ctxReceita, {
+            type: 'line',
+            data: {
+                labels: dadosFinanceiros.receitaDespesa.labels,
+                datasets: [
+                    { label: 'Receita', data: dadosFinanceiros.receitaDespesa.receita, borderColor: COR_GRAFICO, backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4 },
+                    { label: 'Despesa', data: dadosFinanceiros.receitaDespesa.despesa, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.4 }
+                ]
+            }
+        });
+
+        const ctxCustos = document.getElementById('grafico-distribuicao-custos').getContext('2d');
+        if(graficoCustos) graficoCustos.destroy();
+        graficoCustos = new Chart(ctxCustos, {
+            type: 'doughnut',
+            data: {
+                labels: dadosFinanceiros.distribuicaoCustos.labels,
+                datasets: [{ data: dadosFinanceiros.distribuicaoCustos.valores, backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b'] }]
+            }
+        });
+    };
+
+    // --- BLOCO DE RENDERIZAÇÃO: PROJETOS ---
+    const renderizarProjetos = (departamento = 'todos') => {
+        const colunas = { planejado: document.getElementById('coluna-planejado'), progresso: document.getElementById('coluna-progresso'), concluido: document.getElementById('coluna-concluido') };
+        Object.values(colunas).forEach(c => c.innerHTML = '');
+        
+        const projetosFiltrados = departamento === 'todos' ? dadosProjetos : dadosProjetos.filter(p => p.departamento === departamento);
+
+        projetosFiltrados.forEach(p => {
+            const card = `<div class="bg-white p-4 rounded-lg shadow"><p class="font-bold">${p.nome}</p><p class="text-sm text-gray-500">${p.responsavel}</p><p class="text-sm mt-2">Prazo: ${formatarData(p.prazo).split(' ')[0]}</p></div>`;
+            if (p.status === 'Planejado') colunas.planejado.innerHTML += card;
+            else if (p.status === 'Em Progresso') colunas.progresso.innerHTML += card;
+            else colunas.concluido.innerHTML += card;
+        });
+    };
+    
+    // --- BLOCO DE RENDERIZAÇÃO: RELATÓRIOS ---
+    const renderizarRelatorios = () => {
+        document.getElementById('indicador-nps').textContent = dadosRelatorios.nps;
+        document.getElementById('indicador-turnover').textContent = `${dadosRelatorios.turnover}%`;
+        
+        const ctxProd = document.getElementById('grafico-produtividade-depto').getContext('2d');
+        if(graficoProdDepto) graficoProdDepto.destroy();
+        graficoProdDepto = new Chart(ctxProd, {
+            type: 'bar',
+            data: {
+                labels: dadosRelatorios.produtividadeDepto.labels,
+                datasets: [{ label: 'Produtividade Média', data: dadosRelatorios.produtividadeDepto.valores, backgroundColor: COR_GRAFICO , barPercentage: 0.8 //}]
+        }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    };
+
+    // --- BLOCO DE RENDERIZAÇÃO: CURSOS ---
+    const renderizarCursos = () => {
+        selecaoColaborador.innerHTML = '<option value="">Selecione...</option>';
+        dadosFicticios.forEach(u => {
+            selecaoColaborador.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+        });
+
+        catalogoCursos.innerHTML = '';
+        dadosCursos.forEach(curso => {
+            catalogoCursos.innerHTML += `
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="font-bold">${curso.titulo}</h3>
+                    <p class="text-sm text-gray-500">${curso.categoria} - ${curso.duracao}</p>
+                </div>`;
+        });
+    };
+    
+    // --- BLOCO DE RENDERIZAÇÃO: SUPORTE ---
+    const renderizarSuporte = () => {
+        const ticketsAbertos = dadosSuporte.filter(t => t.status === 'Aberto' || t.status === 'Em Andamento').length;
+        const ticketsResolvidos = dadosSuporte.filter(t => t.status === 'Resolvido').length;
+        
+        const tempos = dadosSuporte.filter(t => t.dataResolucao).map(t => new Date(t.dataResolucao) - new Date(t.dataAbertura));
+        const tempoMedioMs = tempos.length > 0 ? tempos.reduce((a, b) => a + b, 0) / tempos.length : 0;
+        const horas = Math.floor(tempoMedioMs / 3600000);
+        const minutos = Math.round((tempoMedioMs % 3600000) / 60000);
+        
+        document.getElementById('card-tickets-abertos').textContent = ticketsAbertos;
+        document.getElementById('card-tickets-resolvidos').textContent = ticketsResolvidos;
+        document.getElementById('card-tempo-resposta').textContent = `${horas}h ${minutos}m`;
+
+        const corpoTabelaSuporte = document.getElementById('corpoTabelaSuporte');
+        corpoTabelaSuporte.innerHTML = '';
+        dadosSuporte.forEach(ticket => {
+            corpoTabelaSuporte.innerHTML += `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${ticket.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${ticket.cliente}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${ticket.assunto}</td>
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${obterBadgeStatusSuporte(ticket.status)}">${ticket.status}</span></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${formatarData(ticket.dataAbertura)}</td>
+                </tr>
+            `;
+        });
+    };
+
+
+    // --- BLOCO DE MODAIS E NOTIFICAÇÕES ---
+    const abrirModalFormulario = (idUsuario = null) => {
+        formularioUsuario.reset();
+        const ehEdicao = idUsuario !== null;
+        tituloModal.textContent = ehEdicao ? 'Editar Usuário' : 'Adicionar Usuário';
+        formularioUsuario.idUsuario.value = ehEdicao ? idUsuario : '';
+
+        if(ehEdicao) {
+            const usuario = dadosFicticios.find(u => u.id === idUsuario);
+            if(usuario) {
+                formularioUsuario.nome.value = usuario.nome;
+                formularioUsuario.email.value = usuario.email;
+                formularioUsuario.cargo.value = usuario.cargo;
+                formularioUsuario.status.value = usuario.status;
+            }
+        }
+        modalFormulario.classList.remove('hidden');
+        modalFormulario.classList.add('flex');
+    };
+    
+    const fecharModalFormulario = () => {
+        modalFormulario.classList.add('hidden');
+        modalFormulario.classList.remove('flex');
+    };
+
+    const abrirModalConfirmacao = (id) => {
+        idParaExcluir = id;
+        modalConfirmacao.classList.remove('hidden');
+        modalConfirmacao.classList.add('flex');
+    }
+    
+    const fecharModalConfirmacao = () => {
+        idParaExcluir = null;
+        modalConfirmacao.classList.add('hidden');
+        modalConfirmacao.classList.remove('flex');
+    }
+
+    const mostrarNotificacao = (mensagem, tipo = 'sucesso') => {
+        const cores = tipo === 'sucesso' 
+            ? 'bg-green-500 border-green-600' 
+            : 'bg-red-500 border-red-600';
+        const notificacao = document.createElement('div');
+        notificacao.className = `p-4 text-white rounded-lg shadow-md border-l-4 ${cores} animacao-notificacao-entrada`;
+        notificacao.textContent = mensagem;
+        containerNotificacao.appendChild(notificacao);
+        setTimeout(() => {
+            notificacao.classList.remove('animacao-notificacao-entrada');
+            notificacao.classList.add('animacao-notificacao-saida');
+            notificacao.addEventListener('animationend', () => notificacao.remove());
+        }, 3000);
+    };
+
+    // --- BLOCO DE EVENT LISTENERS ---
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            alternarTela(e.currentTarget.dataset.tela);
+        });
+    });
+
+    document.getElementById('filtro-departamento').addEventListener('change', (e) => renderizarProjetos(e.target.value));
+    
+    selecaoColaborador.addEventListener('change', (e) => {
+        const idColaborador = parseInt(e.target.value);
+        if (!idColaborador) {
+            containerCursosRecomendados.classList.add('hidden');
+            return;
+        }
+        const colaborador = dadosFicticios.find(u => u.id === idColaborador);
+        if (!colaborador) return;
+
+        const categoriasRecomendadas = mapaCargoCategoria[colaborador.cargo] || [];
+        const cursosRecomendados = dadosCursos.filter(c => categoriasRecomendadas.includes(c.categoria));
+
+        listaCursosRecomendados.innerHTML = '';
+        if(cursosRecomendados.length > 0){
+            cursosRecomendados.forEach(curso => {
+                listaCursosRecomendados.innerHTML += `
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow">
+                        <h3 class="font-bold text-blue-800">${curso.titulo}</h3>
+                        <p class="text-sm text-blue-600">${curso.categoria} - ${curso.duracao}</p>
+                    </div>`;
+            });
+            containerCursosRecomendados.classList.remove('hidden');
+        } else {
+             containerCursosRecomendados.classList.add('hidden');
+        }
+    });
+    
+    campoBusca.addEventListener('input', (e) => {
+        termoBusca = e.target.value.toLowerCase();
+        paginaAtual = 1;
+        renderizarTabela();
+    });
+
+    btnPaginaAnterior.addEventListener('click', () => { if (paginaAtual > 1) { paginaAtual--; renderizarTabela(); } });
+    btnPaginaProxima.addEventListener('click', () => { if (paginaAtual < Math.ceil(dadosFiltrados.length / LINHAS_POR_PAGINA)) { paginaAtual++; renderizarTabela(); } });
+
+    document.querySelector('#tela-usuarios thead').addEventListener('click', (e) => {
+        const th = e.target.closest('th[data-ordenacao]');
+        if (th) {
+            const coluna = th.dataset.ordenacao;
+            direcaoOrdenacao = (colunaOrdenacao === coluna && direcaoOrdenacao === 'asc') ? 'desc' : 'asc';
+            colunaOrdenacao = coluna;
+            renderizarTabela();
+        }
+    });
+    
+    corpoTabela.addEventListener('click', (e) => {
+        const btnEditar = e.target.closest('.btn-editar');
+        const btnExcluir = e.target.closest('.btn-excluir');
+        if (btnEditar) abrirModalFormulario(parseInt(btnEditar.dataset.id));
+        if (btnExcluir) abrirModalConfirmacao(parseInt(btnExcluir.dataset.id));
+    });
+    
+    btnAdicionarUsuario.addEventListener('click', () => abrirModalFormulario());
+    btnFecharModal.addEventListener('click', fecharModalFormulario);
+    btnCancelar.addEventListener('click', fecharModalFormulario);
+    modalFormulario.addEventListener('click', (e) => { if (e.target === modalFormulario) fecharModalFormulario(); });
+
+    formularioUsuario.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const id = parseInt(formularioUsuario.idUsuario.value);
+        const dadosForm = new FormData(e.target);
+        const usuarioDados = Object.fromEntries(dadosForm.entries());
+        
+        if (id) { // Edição
+            const index = dadosFicticios.findIndex(u => u.id === id);
+            if (index !== -1) Object.assign(dadosFicticios[index], usuarioDados);
+             mostrarNotificacao('Usuário atualizado com sucesso!');
+        } else { // Adição
+            const novoId = Math.max(...dadosFicticios.map(u => u.id)) + 1;
+            dadosFicticios.unshift({
+                id: novoId,
+                ...usuarioDados,
+                avatar: `https://i.pravatar.cc/150?u=${novoId}`,
+                ultimoAcesso: new Date().toISOString(),
+                produtividade: Array(7).fill(0).map(() => Math.floor(Math.random() * 100))
+            });
+            mostrarNotificacao('Usuário adicionado com sucesso!');
+        }
+        fecharModalFormulario();
+        renderizarTabela();
+    });
+
+    btnConfirmarExclusao.addEventListener('click', () => {
+        dadosFicticios = dadosFicticios.filter(u => u.id !== idParaExcluir);
+        fecharModalConfirmacao();
+        renderizarTabela();
+        mostrarNotificacao('Usuário excluído com sucesso.', 'erro');
+    });
+    btnCancelarExclusao.addEventListener('click', fecharModalConfirmacao);
+    modalConfirmacao.addEventListener('click', (e) => { if (e.target === modalConfirmacao) fecharModalConfirmacao(); });
+
+    // --- EXECUÇÃO INICIAL ---
+    alternarTela('usuarios'); // Tela inicial
+    renderizarTabela();
+    renderizarFinanceiro();
+    renderizarProjetos();
+    renderizarRelatorios();
+    renderizarCursos();
+    renderizarSuporte();
+});
+</script>
+</body>
+</html>
+
